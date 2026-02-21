@@ -8,158 +8,62 @@
         :root {
             --navy: #1a143d;
             --white: #ffffff;
-            --light-gray: #f4f4f9;
+            --accent: #007aff; /* iOS Blue for links */
+            --gray: #f8f9fa;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--navy);
-            color: var(--white);
+            color: var(--navy);
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            text-align: center;
-        }
-
-        .card {
-            background-color: var(--white);
-            color: var(--navy);
-            width: 90%;
-            max-width: 400px;
-            padding: 40px 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin: 20px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        .logo {
-            max-width: 150px;
-            margin-bottom: 20px;
+        /* The Card Container */
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 380px;
+            border-radius: 24px;
+            padding: 40px 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: none; /* Hidden until data loads */
         }
 
-        h1 { margin: 10px 0 5px 0; font-size: 1.8rem; word-wrap: break-word; }
-        h2 { margin: 0; font-size: 1.1rem; font-weight: 400; color: #555; }
-        .company { font-weight: bold; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; }
+        .logo {
+            width: 140px;
+            height: auto;
+            margin-bottom: 24px;
+        }
 
+        h1 { font-size: 1.75rem; margin: 0; font-weight: 700; }
+        h2 { font-size: 1rem; margin: 4px 0 0 0; font-weight: 400; color: #666; }
+        .company { 
+            font-size: 0.85rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-top: 12px;
+            color: var(--navy);
+        }
+
+        .actions { margin-top: 32px; width: 100%; }
+
+        /* Buttons */
         .btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
-            background-color: var(--navy);
-            color: var(--white);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            font-weight: bold;
-            transition: opacity 0.2s;
-            border: none;
             width: 100%;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .btn:hover { opacity: 0.9; }
-        .btn-secondary { background-color: #e0e0e0; color: var(--navy); }
-
-        #error-msg { display: none; padding: 20px; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-
-    <div id="card" class="card hidden">
-        <img src="Apres Logo.avif" alt="Après Cyber Slopes" class="logo">
-        <h1 id="name">Attendee Name</h1>
-        <h2 id="title">Title</h2>
-        <div id="company" class="company">Company Name</div>
-
-        <button class="btn" onclick="downloadVCard()">💾 Add to Contacts</button>
-        <a id="li-link" href="#" class="btn hidden" target="_blank">🔗 LinkedIn Profile</a>
-        <a id="web-link" href="#" class="btn btn-secondary hidden" target="_blank">🌐 Website</a>
-        <a id="email-link" href="#" class="btn btn-secondary">✉️ Send Email</a>
-    </div>
-
-    <div id="error-msg">
-        <h2>Member Not Found</h2>
-        <p>Please check the QR code and try again.</p>
-    </div>
-
-    <script>
-        let currentUser = null;
-
-        async function loadCard() {
-            const hash = window.location.hash.substring(1); // Get ID from URL
-            if (!hash) return showError();
-
-            try {
-                const response = await fetch('contacts.json');
-                const data = await response.json();
-                currentUser = data[hash];
-
-                if (currentUser) {
-                    document.getElementById('name').textContent = currentUser.name;
-                    document.getElementById('title').textContent = currentUser.title;
-                    document.getElementById('company').textContent = currentUser.company;
-                    document.getElementById('email-link').href = `mailto:${currentUser.email}`;
-
-                    if (currentUser.linkedin) {
-                        const li = document.getElementById('li-link');
-                        li.href = currentUser.linkedin;
-                        li.classList.remove('hidden');
-                    }
-                    if (currentUser.website) {
-                        const web = document.getElementById('web-link');
-                        web.href = currentUser.website;
-                        web.classList.remove('hidden');
-                    }
-
-                    document.getElementById('card').classList.remove('hidden');
-                } else {
-                    showError();
-                }
-            } catch (e) {
-                console.error("Data load failed", e);
-                showError();
-            }
-        }
-
-        function showError() {
-            document.getElementById('error-msg').style.display = 'block';
-        }
-
-        function downloadVCard() {
-            if (!currentUser) return;
-
-            // VCF Format String
-            const vcard = [
-                "BEGIN:VCARD",
-                "VERSION:3.0",
-                `FN:${currentUser.name}`,
-                `ORG:${currentUser.company}`,
-                `TITLE:${currentUser.title}`,
-                `EMAIL:${currentUser.email}`,
-                `URL:${currentUser.linkedin || ''}`,
-                "END:VCARD"
-            ].join("\n");
-
-            const blob = new Blob([vcard], { type: "text/vcard" });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.style.display = "none";
-            a.href = url;
-            a.download = `${currentUser.name.replace(/\s+/g, '_')}.vcf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        window.addEventListener('hashchange', loadCard);
-        loadCard();
-    </script>
-</body>
-</html>
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight:
