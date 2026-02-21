@@ -16,8 +16,8 @@ exports.handler = async (event) => {
 
     try {
         // REPLACE THESE TWO LINES WITH YOUR ACTUAL INFO
-        const REPO_OWNER = "YOUR_GITHUB_USERNAME"; 
-        const REPO_NAME = "YOUR_PRIVATE_REPO_NAME";
+        const REPO_OWNER = "gitbenson"; 
+        const REPO_NAME = "summit-data-private";
         
         const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/contacts.json`;
 
@@ -65,3 +65,4 @@ exports.handler = async (event) => {
         };
     }
 };
+
