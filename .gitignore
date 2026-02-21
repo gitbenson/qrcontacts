@@ -1,0 +1,9 @@
+# Ignore local data
+attendees.csv
+vcard_icon.png
+qr_codes/
+summit_final.py
+append_attendee.py
+
+# Ignore local node modules (for Netlify)
+node_modules/
