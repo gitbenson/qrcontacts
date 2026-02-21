@@ -1,0 +1,42 @@
+{
+  "alex": {
+    "name": "Alex Thompson",
+    "title": "Summit Coordinator",
+    "company": "Après Cyber Slopes",
+    "email": "alex@cyberslopes.com",
+    "linkedin": "https://linkedin.com/in/alex-thompson",
+    "website": "https://aprescyber.info"
+  },
+  "sarah": {
+    "name": "Sarah Jenkins",
+    "title": "Security Researcher",
+    "company": "Summit Labs",
+    "email": "s.jenkins@summitlabs.io",
+    "linkedin": "https://linkedin.com/in/sarahjenkins-cyber",
+    "website": ""
+  },
+  "michael": {
+    "name": "Michael Chen",
+    "title": "Keynote Speaker",
+    "company": "Chen Strategy Group",
+    "email": "mchen@strategy.com",
+    "linkedin": "https://linkedin.com/in/mchen-strategy",
+    "website": "https://chenstrategy.com"
+  },
+  "jessica": {
+    "name": "Jessica Miller",
+    "title": "Lead Instructor",
+    "company": "Après Cyber Slopes",
+    "email": "jmiller@cyberslopes.com",
+    "linkedin": "",
+    "website": "https://jessicamiller.me"
+  },
+  "dave": {
+    "name": "Dave Wilson",
+    "title": "Event Logistics",
+    "company": "Peak Operations",
+    "email": "dave@peakops.net",
+    "linkedin": "https://linkedin.com/in/dave-wilson-ops",
+    "website": ""
+  }
+}

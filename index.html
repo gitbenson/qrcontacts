@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Card | Après Cyber Slopes Summit</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            background: radial-gradient(circle at center, #1a143d 0%, #0d0a21 100%);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+        }
+        .card {
+            background: white; display: flex; width: 100%; max-width: 750px;
+            border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .contact-info { flex: 1.2; padding: 40px; }
+        .label { font-weight: 800; color: #3a86ff; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-top: 15px; }
+        h2 { font-size: 2rem; color: #1a143d; margin-bottom: 5px; }
+        p { color: #444; font-size: 1.1rem; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+        .btn {
+            padding: 10px 22px; text-decoration: none; border-radius: 50px;
+            font-weight: 700; font-size: 0.9rem; transition: all 0.3s ease;
+            display: flex; align-items: center; cursor: pointer; border: none;
+        }
+        .btn-save { background-color: #1a143d; color: white; }
+        .btn-save:hover { background-color: #3a86ff; transform: translateY(-2px); }
+        .btn-link { background-color: #f0f2f5; color: #1a143d; border: 1px solid #ddd; }
+        .btn-link:hover { background-color: #e2e6ea; border-color: #bbb; }
+        .logo-area { flex: 1; background: #100c2b; display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .logo-area img { width: 100%; max-width: 220px; filter: drop-shadow(0 0 10px rgba(58, 134, 255, 0.3)); }
+
+        @media (max-width: 650px) {
+            .card { flex-direction: column-reverse; }
+            .logo-area, .contact-info { text-align: center; }
+            .actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="contact-info">
+            <span class="label">Name</span>
+            <h2 id="name">Loading...</h2>
+            <span class="label">Title</span>
+            <p id="title"></p>
+            <span class="label">Company</span>
+            <p id="company"></p>
+            <span class="label">Email</span>
+            <p id="email"></p>
+            <div class="actions">
+                <button class="btn btn-save" onclick="downloadVCard()">Save Contact</button>
+                <a id="linkedin-link" href="#" class="btn btn-link" target="_blank" style="display: none;">LinkedIn</a>
+                <a id="website-link" href="#" class="btn btn-link" target="_blank" style="display: none;">Website</a>
+            </div>
+        </div>
+        <div class="logo-area">
+            <img src="Apres Logo.avif" alt="Logo">
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        async function initCard() {
+            try {
+                const response = await fetch('contacts.json');
+                const directory = await response.json();
+
+                // HASH ROUTING LOGIC: Looks for everything after the '#'
+                const id = window.location.hash.substring(1); 
+                currentUser = directory[id] || Object.values(directory)[0];
+
+                document.getElementById('name').innerText = currentUser.name;
+                document.getElementById('title').innerText = currentUser.title;
+                document.getElementById('company').innerText = currentUser.company;
+                document.getElementById('email').innerText = currentUser.email;
+
+                if (currentUser.linkedin) {
+                    const ln = document.getElementById('linkedin-link');
+                    ln.href = currentUser.linkedin; ln.style.display = "flex";
+                }
+                if (currentUser.website) {
+                    const wb = document.getElementById('website-link');
+                    wb.href = currentUser.website; wb.style.display = "flex";
+                }
+                document.title = `${currentUser.name} | Contact`;
+            } catch (err) {
+                document.getElementById('name').innerText = "Card Not Found";
+            }
+        }
+
+        function downloadVCard() {
+            if (!currentUser) return;
+            const vcard = ["BEGIN:VCARD","VERSION:3.0",`FN:${currentUser.name}`,`ORG:${currentUser.company}`,`TITLE:${currentUser.title}`,`EMAIL:${currentUser.email}`,currentUser.linkedin ? `URL:${currentUser.linkedin}` : "", "END:VCARD"].filter(Boolean).join("\n");
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `${currentUser.name.replace(/\s+/g, '_')}.vcf`;
+            a.href = url;
+            a.click();
+        }
+
+        // Listen for hash changes so the page updates if the user clicks a different link
+        window.addEventListener('hashchange', initCard);
+        initCard();
+    </script>
+</body>
+</html>
