@@ -66,4 +66,129 @@
             margin-bottom: 12px;
             border-radius: 12px;
             text-decoration: none;
-            font-weight:
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary { background: var(--navy); color: var(--white); }
+        .btn-secondary { background: var(--gray); color: var(--navy); }
+
+        /* Loading & Error States */
+        #status-msg { color: var(--white); font-weight: 500; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="status-msg">🏔️ Loading Card...</div>
+
+    <div id="card" class="card">
+        <img src="Apres Logo.avif" alt="Après Cyber Slopes" class="logo">
+        
+        <h1 id="disp-name"></h1>
+        <h2 id="disp-title"></h2>
+        <div id="disp-company" class="company"></div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="downloadVCard()">
+                💾 Add to Contacts
+            </button>
+
+            <a id="li-link" href="#" target="_blank" class="btn btn-secondary hidden">
+                🔗 LinkedIn Profile
+            </a>
+            
+            <a id="web-link" href="#" target="_blank" class="btn btn-secondary hidden">
+                🌐 Website
+            </a>
+
+            <a id="email-link" href="#" class="btn btn-secondary">
+                ✉️ Send Email
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        async function init() {
+            const attendeeId = window.location.hash.substring(1);
+            const statusMsg = document.getElementById('status-msg');
+            const cardElement = document.getElementById('card');
+
+            if (!attendeeId) {
+                statusMsg.textContent = "❌ No attendee ID found in URL.";
+                return;
+            }
+
+            try {
+                // CALLING THE NETLIFY FUNCTION INSTEAD OF JSON FILE
+                const response = await fetch(`/.netlify/functions/get-contact?id=${attendeeId}`);
+                
+                if (!response.ok) {
+                    throw new Error("Attendee not found");
+                }
+
+                currentUser = await response.json();
+
+                // Populate UI
+                document.getElementById('disp-name').textContent = currentUser.name;
+                document.getElementById('disp-title').textContent = currentUser.title;
+                document.getElementById('disp-company').textContent = currentUser.company;
+                document.getElementById('email-link').href = `mailto:${currentUser.email}`;
+
+                if (currentUser.linkedin) {
+                    const el = document.getElementById('li-link');
+                    el.href = currentUser.linkedin;
+                    el.classList.remove('hidden');
+                }
+
+                if (currentUser.website) {
+                    const el = document.getElementById('web-link');
+                    el.href = currentUser.website;
+                    el.classList.remove('hidden');
+                }
+
+                // Show Card, Hide Loader
+                statusMsg.classList.add('hidden');
+                cardElement.style.display = 'block';
+
+            } catch (err) {
+                statusMsg.textContent = "⚠️ Attendee not found or private directory error.";
+                console.error(err);
+            }
+        }
+
+        function downloadVCard() {
+            if (!currentUser) return;
+
+            const vcard = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                `FN:${currentUser.name}`,
+                `ORG:${currentUser.company}`,
+                `TITLE:${currentUser.title}`,
+                `EMAIL:${currentUser.email}`,
+                `URL:${currentUser.linkedin || ''}`,
+                "END:VCARD"
+            ].join("\n");
+
+            const blob = new Blob([vcard], { type: "text/vcard" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${currentUser.name.replace(/\s+/g, '_')}.vcf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        window.addEventListener('hashchange', () => location.reload());
+        init();
+    </script>
+</body>
+</html>
