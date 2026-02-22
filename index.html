@@ -8,14 +8,14 @@
         :root {
             --navy: #1a143d;
             --white: #ffffff;
-            --accent: #007aff; /* iOS Blue for links */
+            --accent: #007aff; 
             --gray: #f8f9fa;
+            --text-muted: #666;
         }
 
         body {
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--navy);
-            color: var(--navy);
             margin: 0;
             display: flex;
             justify-content: center;
@@ -25,7 +25,6 @@
             box-sizing: border-box;
         }
 
-        /* The Card Container */
         .card {
             background: var(--white);
             width: 100%;
@@ -34,7 +33,7 @@
             padding: 40px 24px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            display: none; /* Hidden until data loads */
+            display: none; 
         }
 
         .logo {
@@ -43,8 +42,9 @@
             margin-bottom: 24px;
         }
 
-        h1 { font-size: 1.75rem; margin: 0; font-weight: 700; }
-        h2 { font-size: 1rem; margin: 4px 0 0 0; font-weight: 400; color: #666; }
+        h1 { font-size: 1.75rem; margin: 0; font-weight: 700; color: var(--navy); }
+        h2 { font-size: 1rem; margin: 4px 0 0 0; font-weight: 400; color: var(--text-muted); }
+        
         .company { 
             font-size: 0.85rem; 
             font-weight: 800; 
@@ -56,7 +56,6 @@
 
         .actions { margin-top: 32px; width: 100%; }
 
-        /* Buttons */
         .btn {
             display: flex;
             align-items: center;
@@ -77,7 +76,23 @@
         .btn-primary { background: var(--navy); color: var(--white); }
         .btn-secondary { background: var(--gray); color: var(--navy); }
 
-        /* Loading & Error States */
+        /* Email Text Link Styles */
+        .contact-info-footer {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .email-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .email-link:hover { text-decoration: underline; }
+
         #status-msg { color: var(--white); font-weight: 500; }
         .hidden { display: none; }
     </style>
@@ -105,10 +120,10 @@
             <a id="web-link" href="#" target="_blank" class="btn btn-secondary hidden">
                 🌐 Website
             </a>
+        </div>
 
-            <a id="email-link" href="#" class="btn btn-secondary">
-                ✉️ Send Email
-            </a>
+        <div class="contact-info-footer">
+            <a id="email-link" href="#" class="email-link"></a>
         </div>
     </div>
 
@@ -121,17 +136,15 @@
             const cardElement = document.getElementById('card');
 
             if (!attendeeId) {
-                statusMsg.textContent = "❌ No attendee ID found in URL.";
+                statusMsg.textContent = "❌ No attendee ID found.";
                 return;
             }
 
             try {
-                // CALLING THE NETLIFY FUNCTION INSTEAD OF JSON FILE
+                // Fetch from your Netlify function
                 const response = await fetch(`/.netlify/functions/get-contact?id=${attendeeId}`);
                 
-                if (!response.ok) {
-                    throw new Error("Attendee not found");
-                }
+                if (!response.ok) throw new Error("Not Found");
 
                 currentUser = await response.json();
 
@@ -139,7 +152,11 @@
                 document.getElementById('disp-name').textContent = currentUser.name;
                 document.getElementById('disp-title').textContent = currentUser.title;
                 document.getElementById('disp-company').textContent = currentUser.company;
-                document.getElementById('email-link').href = `mailto:${currentUser.email}`;
+
+                // Set Email Link
+                const emailEl = document.getElementById('email-link');
+                emailEl.href = `mailto:${currentUser.email}`;
+                emailEl.textContent = currentUser.email;
 
                 if (currentUser.linkedin) {
                     const el = document.getElementById('li-link');
@@ -153,19 +170,17 @@
                     el.classList.remove('hidden');
                 }
 
-                // Show Card, Hide Loader
                 statusMsg.classList.add('hidden');
                 cardElement.style.display = 'block';
 
             } catch (err) {
-                statusMsg.textContent = "⚠️ Attendee not found or private directory error.";
+                statusMsg.textContent = "⚠️ Attendee not found or connection error.";
                 console.error(err);
             }
         }
 
         function downloadVCard() {
             if (!currentUser) return;
-
             const vcard = [
                 "BEGIN:VCARD",
                 "VERSION:3.0",
