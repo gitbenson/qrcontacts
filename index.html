@@ -52,9 +52,25 @@
             letter-spacing: 1px; 
             margin-top: 12px;
             color: var(--navy);
+            margin-bottom: 24px;
         }
 
-        .actions { margin-top: 32px; width: 100%; }
+        /* Email Link Section */
+        .email-display {
+            margin-bottom: 32px;
+            padding-bottom: 10px;
+        }
+
+        .email-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        .email-link:hover { text-decoration: underline; }
+
+        .actions { width: 100%; }
 
         .btn {
             display: flex;
@@ -76,23 +92,6 @@
         .btn-primary { background: var(--navy); color: var(--white); }
         .btn-secondary { background: var(--gray); color: var(--navy); }
 
-        /* Email Text Link Styles */
-        .contact-info-footer {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .email-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            word-break: break-all;
-        }
-
-        .email-link:hover { text-decoration: underline; }
-
         #status-msg { color: var(--white); font-weight: 500; }
         .hidden { display: none; }
     </style>
@@ -108,6 +107,10 @@
         <h2 id="disp-title"></h2>
         <div id="disp-company" class="company"></div>
 
+        <div class="email-display">
+            <a id="email-link" href="#" class="email-link"></a>
+        </div>
+
         <div class="actions">
             <button class="btn btn-primary" onclick="downloadVCard()">
                 💾 Add to Contacts
@@ -120,10 +123,6 @@
             <a id="web-link" href="#" target="_blank" class="btn btn-secondary hidden">
                 🌐 Website
             </a>
-        </div>
-
-        <div class="contact-info-footer">
-            <a id="email-link" href="#" class="email-link"></a>
         </div>
     </div>
 
@@ -141,19 +140,15 @@
             }
 
             try {
-                // Fetch from your Netlify function
                 const response = await fetch(`/.netlify/functions/get-contact?id=${attendeeId}`);
-                
                 if (!response.ok) throw new Error("Not Found");
 
                 currentUser = await response.json();
 
-                // Populate UI
                 document.getElementById('disp-name').textContent = currentUser.name;
                 document.getElementById('disp-title').textContent = currentUser.title;
                 document.getElementById('disp-company').textContent = currentUser.company;
 
-                // Set Email Link
                 const emailEl = document.getElementById('email-link');
                 emailEl.href = `mailto:${currentUser.email}`;
                 emailEl.textContent = currentUser.email;
