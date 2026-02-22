@@ -13,7 +13,7 @@ exports.handler = async (event) => {
     try {
         // 2. Fetch the master file from your PRIVATE GitHub Repository
         // Replace YOUR_USER and YOUR_PRIVATE_REPO with your actual GitHub details
-        const url = `https://api.github.com/repos/YOUR_USER/YOUR_PRIVATE_REPO/contents/contacts.json`;
+        const url = `https://api.github.com/repos/gitbenson/summit-data-private/contents/contacts.json`;
         
         const response = await axios.get(url, {
             headers: { 
@@ -52,3 +52,4 @@ exports.handler = async (event) => {
         };
     }
 };
+
